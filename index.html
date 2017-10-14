@@ -111,6 +111,8 @@
 				var name = document.getElementById("n").value;
 				var url = document.getElementById("u").value;
 				
+				setup.u = name;
+				
 				if (name.length > 3) {
 					setup.c[0].setCloud('url', url);
 				} else {
