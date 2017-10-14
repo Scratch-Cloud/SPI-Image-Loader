@@ -55,7 +55,7 @@
 					this.send(JSON.stringify(object) + "\n");
 				};
 				setup.c[connectid].setCloud = function (n, v) {
-					this.packet('set', {name: setup.p + name, value: v});
+					this.packet('set', {name: setup.p + n, value: v});
 				};
 				setup.c[connectid].getCloud = function (n, callback) {
 					vn = name;
