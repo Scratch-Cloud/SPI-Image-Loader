@@ -17,12 +17,13 @@
 	</head>
 	<body>
 		<div id="form">
-			<input type="text" id="m" class="m" placeholder="Scratch Username" />
+			<input type="text" id="n" class="m" placeholder="Scratch Username" />
 			<br>
 			<br>
-			<input type="text" id="m" class="m" placeholder="SVG Image URL" />
+			<input type="text" id="u" class="m" placeholder="SVG Image URL" />
 			<br>
 			<br>
+			You agree that this svg is appropriate for all ages?
 			<input type="submit" onclick="submit()" class="m" value="Submit" />
 		</div>
 		<hr>
@@ -103,8 +104,18 @@
 				return setup.c[connectid];
 			};
 			
+			// Setup the connection
+			wssConnect("179883315", 0, function() {});
+			
 			function submit() {
+				var name = document.getElementById("n").value;
+				var url = document.getElementById("u").value;
 				
+				if (name.length > 3) {
+					setup.u[0].setCloud('url', url);
+				} else {
+					document.getElementById("output").innerHMTL = "Invalid username";
+				};
 			}
 		</script>
 	</body>
