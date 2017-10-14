@@ -1,1 +1,111 @@
-
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Scratch Cloud SVG Loader</title>
+		<style>
+			body {
+			font-family: "Courier New", "Courier", monospace;
+			}
+			input {
+			width: 100px;
+			box-sizing: border-box;
+			}
+			.m {
+			width: 230px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="form">
+			<input type="text" id="m" class="m" placeholder="Scratch Username" />
+			<br>
+			<br>
+			<input type="text" id="m" class="m" placeholder="SVG Image URL" />
+			<br>
+			<br>
+			<input type="submit" onclick="submit()" class="m" value="Submit" />
+		</div>
+		<hr>
+		<div id="output"></div>
+		<script>
+			var setup = {
+				u: "",
+				c: {},
+				p: "☁ "
+			};
+			
+			var wssConnect = function (project, connectid, callback) {
+				// Start the new connection
+				setup.c[connectid] = new WebSocket("wss://clouddata.scratch.mit.edu/", [], {});
+				// Set up some function-specific variables
+				var vn = "";
+				var cbg = null;
+				setup.c[connectid].projectID = project;
+				// Define the functions
+				setup.c[connectid].packet = function (m, o) {
+					var object = {
+						user: setup.u,
+						project_id: project,
+						method: m,
+					};
+					for(var name in o) {
+						object[name] = o[name];
+					};
+					this.send(JSON.stringify(object) + "\n");
+				};
+				setup.c[connectid].setCloud = function (n, v) {
+					this.packet('set', {name: setup.p + name, value: v});
+				};
+				setup.c[connectid].getCloud = function (n, callback) {
+					vn = name;
+					if (callback) {
+						cbg = callback;
+					}
+					this.packet('handshake', {});
+				};
+				setup.c[connectid].onopen = function() {
+					console.log("Connected to project " + project);
+					this.packet('handshake', {});
+					if (callback) callback();
+				};
+				setup.c[connectid].onclose = function() {
+					console.log("Project " + project + " closed the connection. Reconnecting...");
+					wssConnect(project, connectid, callback);
+				};
+				setup.c[connectid].onmessage = function(m) {
+					if (vn !== "") {
+						var objs = m.data.split("\n");
+						var njs = "[";
+						for (i = 0; i < objs.length-1; i++) {
+							if(i != objs.length-2) {
+								njs += objs[i] + ",";
+							} else {
+								njs += objs[i];
+							}
+						}
+						njs += "]";
+						objs = JSON.parse(njs);
+						var lastReceived = {};
+						for(i = 0; i < objs.length; i++) {
+							if  (objs[i].name === setup.p + vn) {
+								lastReceived = objs[i];
+							}
+						}
+						if (cbg != null) {
+							cbg(lastReceived)
+						}
+						vn = ""
+					}
+				};
+				setup.c[connectid].onerror = function (e) {
+					console.log("Connection FAILED: " + e);
+				};
+				return setup.c[connectid];
+			};
+			
+			function submit() {
+				
+			}
+		</script>
+	</body>
+</html>
