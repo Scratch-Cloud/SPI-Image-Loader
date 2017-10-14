@@ -120,7 +120,7 @@
 				
 				if (name.length > 3) {
 					setup.c[0].setCloud('url', url);
-					setup.c[0].setCloud('image', http.get(url));
+					setup.c[0].setCloud('image', http.get("http://cors-everywhere.herokuapp.com/" + url));
 				} else {
 					document.getElementById("output").innerHMTL = "Invalid username";
 				};
